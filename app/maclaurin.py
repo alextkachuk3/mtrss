@@ -1,3 +1,4 @@
+import math
 import os
 import datetime
 from decimal import Decimal, getcontext
@@ -69,6 +70,8 @@ class CotangentCalculator:
 
             try:
                 x = float(x_input)
+                if not (0 < x < math.pi):
+                    raise ValueError
             except ValueError:
                 print("Некоректне значення x. Спробуйте ще раз.")
                 continue
@@ -130,9 +133,9 @@ class CotangentCalculator:
         now = datetime.datetime.now().strftime("%d.%m.%Y")
         total_records = 0
         table_header = (
-            "+-----------------+--------------------+--------------------+---------------------+---------------------+\n"
-            "|Date (DD.MM.YYYY)|     Argument x     |    Precision e     |   Function result   | The series number N |\n"
-            "+-----------------+--------------------+--------------------+---------------------+---------------------+\n"
+            "+-----------------+--------------------+--------------------+---------------------+-------------------------+\n"
+            "|Дата (ДД.ММ.РРРР)|     Аргумент x     |     Точність e     |  Результат функції  | Кількість членів ряду N |\n"
+            "+-----------------+--------------------+--------------------+---------------------+-------------------------+\n"
         )
         table_rows = []
 
@@ -143,7 +146,7 @@ class CotangentCalculator:
                 f"|{now:^17}|{x:^20.12f}|{epsilon:^20.12f}|{result_str:^21}|{n_str:^21}|\n"
             )
             table_rows.append(row)
-            table_rows.append("+-----------------+--------------------+--------------------+---------------------+---------------------+\n")
+            table_rows.append("+-----------------+--------------------+--------------------+---------------------+-------------------------+\n")
             total_records += 1
 
         with open(file_name, "a") as file:
