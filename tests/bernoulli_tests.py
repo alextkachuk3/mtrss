@@ -1,6 +1,6 @@
 import unittest
 from fractions import Fraction
-from app.Bernoulli import Bernoulli
+from app.bernoulli import Bernoulli
 
 
 class TestBernoulli(unittest.TestCase):
