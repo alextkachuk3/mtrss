@@ -1,25 +1,20 @@
-import threading
-from math import pi
+import os
+import datetime
 from decimal import Decimal, getcontext
-from bernoulli import Bernoulli
+from threading import Thread
 from math import factorial
+from bernoulli import Bernoulli
 
 
 class TimeoutException(Exception):
-    """Користувацьке виключення для таймауту."""
     pass
 
 
 class Maclaurin:
     @staticmethod
     def cotangent_worker(x, epsilon, result_container):
-        """Обчислює значення ряду і записує результат у контейнер."""
         try:
-            if x == 0.0 or abs(x) >= pi:
-                raise ValueError("x must be in the range (0, π) and not equal 0.")
-
             getcontext().prec = 100
-
             x = Decimal(x)
             epsilon = Decimal(epsilon)
 
@@ -30,8 +25,7 @@ class Maclaurin:
                 bernoulli_number = Bernoulli.evaluate(2 * n)
                 term = (
                     Decimal((-4) ** n)
-                    * Decimal(bernoulli_number.numerator)
-                    / Decimal(bernoulli_number.denominator)
+                    * Decimal(bernoulli_number.numerator) / Decimal(bernoulli_number.denominator)
                     * (x ** (2 * n - 1))
                     / Decimal(factorial(2 * n))
                 )
@@ -42,21 +36,19 @@ class Maclaurin:
                 sum_result += term
                 n += 1
 
-            result_container["result"] = float(sum_result)
+            result_container["result"] = (float(sum_result), n)
         except Exception as e:
             result_container["exception"] = e
 
     @staticmethod
-    def cotangent(x, epsilon, timeout=60):
-        """Обчислення значення котангенса з таймаутом."""
+    def cotangent(x, epsilon, timeout=900):
         result_container = {"result": None, "exception": None}
-        thread = threading.Thread(target=Maclaurin.cotangent_worker, args=(x, epsilon, result_container))
+        thread = Thread(target=Maclaurin.cotangent_worker, args=(x, epsilon, result_container))
         thread.start()
-        thread.join(timeout)  # Очікування завершення потоку
+        thread.join(timeout)
 
         if thread.is_alive():
-            thread.join(0)  # Примусове завершення потоку
-            raise TimeoutException("The computation took too long and was terminated.")
+            raise TimeoutException("The computation took too long (timeout exceeded).")
 
         if result_container["exception"]:
             raise result_container["exception"]
@@ -64,3 +56,99 @@ class Maclaurin:
         return result_container["result"]
 
 
+class CotangentCalculator:
+    def __init__(self):
+        self.results = []
+        self.file_name = None
+
+    def input_data(self):
+        while True:
+            x_input = input("Задайте аргумент функції (або введіть 'Кінець' для завершення): ").strip()
+            if x_input.lower() == "кінець":
+                break
+
+            try:
+                x = float(x_input)
+            except ValueError:
+                print("Некоректне значення x. Спробуйте ще раз.")
+                continue
+
+            e_input = input("Задайте точність обчислення: ").strip()
+            try:
+                epsilon = float(e_input)
+                if not (0 < epsilon < 1):
+                    raise ValueError
+            except ValueError:
+                print("Некоректне значення точності. Спробуйте ще раз.")
+                continue
+
+            try:
+                result, n = Maclaurin.cotangent(x, epsilon)
+                self.results.append((x, epsilon, result, n))
+                print(f"Значення функції: {result:.12f}, Кількість членів ряду: {n}")
+            except TimeoutException:
+                print("Обчислення перевищило максимальний час (15 хвилин).")
+                self.results.append((x, epsilon, None, None))
+            except Exception as e:
+                print(f"Помилка: {e}")
+                self.results.append((x, epsilon, None, None))
+
+    def save_results(self):
+        if not self.results:
+            print("Результати відсутні, нічого записувати.")
+            return
+
+        save_choice = input("Записати результати у файл? (Так/Ні): ").strip().lower()
+        if save_choice != "так":
+            print("Дані у файл не записано.")
+            return
+
+        if self.file_name:
+            reuse_choice = input(f"Записати результати у файл {self.file_name}? (Так/Ні): ").strip().lower()
+            if reuse_choice == "так":
+                self._write_to_file(self.file_name)
+                return
+
+        while True:
+            file_name = input(
+                "Введіть ім'я нового файлу (до 5 символів, або '*' для відмови): "
+            ).strip()
+            if file_name == "*":
+                print("Дані у файл не записано.")
+                return
+
+            if not (1 <= len(file_name) <= 5 and file_name.isalnum()):
+                print("Некоректне ім'я файлу. Спробуйте ще раз.")
+                continue
+
+            self.file_name = file_name + ".txt"
+            break
+
+        self._write_to_file(self.file_name)
+
+    def _write_to_file(self, file_name):
+        now = datetime.datetime.now().strftime("%d.%m.%Y")
+        total_records = 0
+        table_header = (
+            "+-----------------+--------------------+--------------------+---------------------+---------------------+\n"
+            "|Date (DD.MM.YYYY)|     Argument x     |    Precision e     |   Function result   | The series number N |\n"
+            "+-----------------+--------------------+--------------------+---------------------+---------------------+\n"
+        )
+        table_rows = []
+
+        for x, epsilon, result, n in self.results:
+            result_str = f"{result:.12f}" if result is not None else "-"
+            n_str = str(n) if n is not None else "-"
+            row = (
+                f"|{now:^17}|{x:^20.12f}|{epsilon:^20.12f}|{result_str:^21}|{n_str:^21}|\n"
+            )
+            table_rows.append(row)
+            table_rows.append("+-----------------+--------------------+--------------------+---------------------+---------------------+\n")
+            total_records += 1
+
+        with open(file_name, "a") as file:
+            if os.stat(file_name).st_size == 0:
+                file.write(table_header)
+            file.writelines(table_rows)
+
+        print(f"Дані у файл {file_name} записано. Поточна кількість записів дорівнює {total_records}.")

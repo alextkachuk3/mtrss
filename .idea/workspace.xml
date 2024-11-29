@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d92fd984-a1de-403d-b833-4a5d9048d5b4" name="Changes" comment="Maclaurin cotangents">
+    <list default="true" id="d92fd984-a1de-403d-b833-4a5d9048d5b4" name="Changes" comment="Computation timeout">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/maclaurin.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/maclaurin.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
@@ -87,23 +87,21 @@
       <option name="project" value="LOCAL" />
       <updated>1732874998236</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Computation timeout">
+      <option name="closed" value="true" />
+      <created>1732876229230</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1732876229230</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Bernoulli" />
     <MESSAGE value="Maclaurin cotangents" />
-    <option name="LAST_COMMIT_MESSAGE" value="Maclaurin cotangents" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app/maclaurin.py</url>
-          <line>50</line>
-          <option name="timeStamp" value="6" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <MESSAGE value="Computation timeout" />
+    <option name="LAST_COMMIT_MESSAGE" value="Computation timeout" />
   </component>
 </project>
