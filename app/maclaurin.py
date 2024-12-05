@@ -37,9 +37,11 @@ class Maclaurin:
                 sum_result += term
                 n += 1
 
-            result_container["result"] = (float(sum_result), n)
+            significant_digits = -int(epsilon.log10())
+            result_container["result"] = (round(float(sum_result), significant_digits), n)
         except Exception as e:
             result_container["exception"] = e
+
 
     @staticmethod
     def cotangent(x, epsilon, timeout=900):
@@ -87,8 +89,10 @@ class CotangentCalculator:
 
             try:
                 result, n = Maclaurin.cotangent(x, epsilon)
+                significant_digits = abs(int(math.log10(epsilon)))
+                formatted_result = f"{result:.{significant_digits}f}"
                 self.results.append((x, epsilon, result, n))
-                print(f"Значення функції: {result:.12f}, Кількість членів ряду: {n}")
+                print(f"Значення функції: {formatted_result}, Кількість членів ряду: {n}")
             except TimeoutException:
                 print("Обчислення перевищило максимальний час (15 хвилин).")
                 self.results.append((x, epsilon, None, None))
@@ -140,18 +144,26 @@ class CotangentCalculator:
         table_rows = []
 
         for x, epsilon, result, n in self.results:
-            result_str = f"{result:.12f}" if result is not None else "-"
+            epsilon_str = f"{epsilon:.10f}".rstrip('0').rstrip('.') if epsilon is not None else "-"
+            result_str = (
+                f"{result:.{abs(int(math.log10(epsilon)))}f}" if result is not None else "-"
+            )
             n_str = str(n) if n is not None else "-"
+
             row = (
-                f"|{now:^17}|{x:^20.12f}|{epsilon:^20.12f}|{result_str:^21}|{n_str:^21}|\n"
+                f"|{now:^17}|{x:^20.12f}|{epsilon_str:^20}|{result_str:^21}|{n_str:^25}|\n"
             )
             table_rows.append(row)
-            table_rows.append("+-----------------+--------------------+--------------------+---------------------+-------------------------+\n")
+            table_rows.append(
+                "+-----------------+--------------------+--------------------+---------------------+-------------------------+\n")
             total_records += 1
 
-        with open(file_name, "a") as file:
+        with open(file_name, "a", encoding="utf-8") as file:
             if os.stat(file_name).st_size == 0:
                 file.write(table_header)
             file.writelines(table_rows)
 
         print(f"Дані у файл {file_name} записано. Поточна кількість записів дорівнює {total_records}.")
+
+
+
