@@ -68,12 +68,13 @@ class FileWriter:
             if x is None or epsilon is None or result is None or n is None:
                 continue
 
+            formatted_x = f"{x:.12g}".rstrip('0').rstrip('.')
             epsilon_str = f"{epsilon:.10f}".rstrip('0').rstrip('.')
             result_str = f"{result:.{abs(int(math.log10(epsilon)))}f}" if result is not None else "-"
             n_str = str(n) if n is not None else "-"
 
             row = (
-                f"|{now:^17}|{x:^20.12f}|{epsilon_str:^20}|{result_str:^21}|{n_str:^25}|\n"
+                f"|{now:^17}|{formatted_x:^20}|{epsilon_str:^20}|{result_str:^21}|{n_str:^25}|\n"
             )
             table_rows.append(row)
             table_rows.append(

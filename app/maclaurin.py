@@ -92,15 +92,15 @@ class CotangentCalculator:
                 result, n = Maclaurin.cotangent(x, epsilon)
                 significant_digits = abs(int(math.log10(epsilon)))
                 formatted_result = f"{result:.{significant_digits}f}"
+                formatted_x = f"{x:.12g}".rstrip('0').rstrip('.')
                 self.results.append((x, epsilon, result, n))
-                print(f"Значення функції: {formatted_result}, Кількість членів ряду: {n}")
+                print(f"Значення функції: {formatted_result}, Аргумент x: {formatted_x}, Кількість членів ряду: {n}")
             except TimeoutException:
                 print("Обчислення перевищило максимальний час (15 хвилин).")
                 self.results.append((x, epsilon, None, None))
             except Exception as e:
                 print(f"Помилка: {e}")
                 self.results.append((x, epsilon, None, None))
-
 
     def save_results(self):
         self.file_writer.save_results(self.results)
