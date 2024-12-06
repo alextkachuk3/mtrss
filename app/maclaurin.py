@@ -74,10 +74,12 @@ class CotangentCalculator:
 
             try:
                 x = float(x_input)
-                if not (0 < x < math.pi):
-                    raise ValueError
             except ValueError:
                 print("Некоректне значення x. Спробуйте ще раз.")
+                continue
+
+            if not (0 < x < math.pi):
+                print("Значення x має бути в межах (0, π)")
                 continue
 
             e_input = input("Задайте точність обчислення: ").strip()
@@ -148,9 +150,11 @@ class CotangentCalculator:
                 print("Дані у файл не записано.")
                 return
 
-            if not (1 <= len(file_name) <= 5 and file_name.isalnum()):
-                print("Некоректне ім’я файлу. Спробуйте ще раз.")
+            if not (1 <= len(file_name) <= 5):
+                print("Некоректне ім’я файлу. Назва файлу повинна містити від 1 до 5 символів. Спробуйте ще раз.")
                 continue
+            if not(file_name.isalnum()):
+                print("Некоректне ім’я файлу. Назва файлу повинна містити лише літери латинського і українсього алфавіту і цифри. Спробуйте ще раз.")
 
             self.file_name = file_name + ".txt"
             break
