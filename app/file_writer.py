@@ -18,6 +18,11 @@ class FileWriter:
         with open(self.last_used_file_path, "w", encoding="utf-8") as file:
             file.write(self.file_name)
 
+    def _get_existing_files(self):
+        return [
+            f for f in os.listdir() if f.endswith(".txt") and os.path.isfile(f)
+        ]
+
     def save_results(self, results):
         if not results:
             print("Результати відсутні, нічого записувати.")
@@ -28,29 +33,46 @@ class FileWriter:
             print("Дані у файл не записано.")
             return
 
-        if self.file_name:
-            reuse_choice = input(
-                f"Записати результати у файл {self.file_name}? (Так/Ні): "
-            ).strip().lower()
-            if reuse_choice == "так":
-                self._write_to_file(results, self.file_name)
-                return
+        existing_files = self._get_existing_files()
+        if len(existing_files) >= 5:
+            print("Кількість існуючих файлів досягла 5.")
+            while True:
+                print(f"Список файлів: {', '.join(existing_files)}")
+                file_name = input(
+                    "Введіть ім’я існуючого файлу або символ * для відмови: "
+                ).strip()
+                if file_name == "*":
+                    print("Дані у файл не записано.")
+                    return
+                if file_name in existing_files:
+                    self.file_name = file_name
+                    break
+                print("Некоректне ім’я. Спробуйте ще раз.")
 
-        while True:
-            file_name = input("Введіть ім’я файлу: ").strip()
-            if file_name == "*":
-                print("Дані у файл не записано.")
-                return
+        else:
+            if self.file_name:
+                reuse_choice = input(
+                    f"Записати результати у файл {self.file_name}? (Так/Ні): "
+                ).strip().lower()
+                if reuse_choice == "так":
+                    self._write_to_file(results, self.file_name)
+                    return
 
-            if not (1 <= len(file_name) <= 5):
-                print("Некоректне ім’я файлу. Назва файлу повинна містити від 1 до 5 символів. Спробуйте ще раз.")
-                continue
-            if not file_name.isalnum():
-                print("Некоректне ім’я файлу. Назва файлу повинна містити лише літери і цифри.")
-                continue
+            while True:
+                file_name = input("Введіть ім’я нового файлу: ").strip()
+                if file_name == "*":
+                    print("Дані у файл не записано.")
+                    return
 
-            self.file_name = file_name + ".txt"
-            break
+                if not (1 <= len(file_name) <= 5):
+                    print("Некоректне ім’я файлу. Назва файлу повинна містити від 1 до 5 символів. Спробуйте ще раз.")
+                    continue
+                if not file_name.isalnum():
+                    print("Некоректне ім’я файлу. Назва файлу повинна містити лише літери і цифри.")
+                    continue
+
+                self.file_name = file_name + ".txt"
+                break
 
         self._write_to_file(results, self.file_name)
 
